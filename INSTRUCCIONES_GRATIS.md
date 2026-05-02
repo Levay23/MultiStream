@@ -13,8 +13,8 @@ He preparado todo para que el panel funcione sin que tengas que pagar el Plan Bl
 3. Conecta tu repositorio de GitHub: **Levay23/MultiStream**.
 4. Configura el servicio así:
    - **Runtime**: `Node`
-   - **Build Command**: `pnpm install --no-frozen-lockfile && node ./build.mjs`
-   - **Start Command**: `node ./dist/index.mjs`
+   - **Build Command**: `pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server build`
+   - **Start Command**: `pnpm --filter @workspace/api-server start`
 5. En la pestaña **Environment**, añade estas variables:
    - `DATABASE_URL`: `postgresql://neondb_owner:npg_ILmb1DnYeO9z@ep-noisy-queen-am39t9ve.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require`
    - `PORT`: `8080`
