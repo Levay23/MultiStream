@@ -3,20 +3,34 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: StreamSync Panel API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: dashboard
+    description: Dashboard stats
+  - name: users
+    description: User management
+  - name: servers
+    description: Server management
+  - name: packages
+    description: Package management
+  - name: resellers
+    description: Reseller management
+  - name: streaming
+    description: Streaming session data
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +38,499 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current logged-in user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /streaming/sessions:
+    get:
+      operationId: getStreamingSessions
+      tags: [streaming]
+      summary: Get active streaming sessions for all services
+      responses:
+        "200":
+          description: Active sessions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreamingSessions"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [admin, reseller, client]
+        - in: query
+          name: service
+          schema:
+            type: string
+            enum: [plex, jellyfin, emby]
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: resellerId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get a user by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+    put:
+      operationId: updateUser
+      tags: [users]
+      summary: Update a user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete a user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /servers:
+    get:
+      operationId: listServers
+      tags: [servers]
+      summary: List all servers
+      responses:
+        "200":
+          description: List of servers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Server"
+    post:
+      operationId: createServer
+      tags: [servers]
+      summary: Create a new server
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServerBody"
+      responses:
+        "201":
+          description: Server created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+
+  /servers/{id}:
+    get:
+      operationId: getServer
+      tags: [servers]
+      summary: Get a server by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Server found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+    put:
+      operationId: updateServer
+      tags: [servers]
+      summary: Update a server
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateServerBody"
+      responses:
+        "200":
+          description: Server updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+    delete:
+      operationId: deleteServer
+      tags: [servers]
+      summary: Delete a server
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /servers/{id}/test:
+    post:
+      operationId: testServerConnection
+      tags: [servers]
+      summary: Test connection to a server using its API key
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerTestResult"
+        "404":
+          description: Server not found
+
+  /packages:
+    get:
+      operationId: listPackages
+      tags: [packages]
+      summary: List all packages
+      responses:
+        "200":
+          description: List of packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Package"
+    post:
+      operationId: createPackage
+      tags: [packages]
+      summary: Create a package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePackageBody"
+      responses:
+        "201":
+          description: Package created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+
+  /packages/{id}:
+    get:
+      operationId: getPackage
+      tags: [packages]
+      summary: Get a package by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Package found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+    put:
+      operationId: updatePackage
+      tags: [packages]
+      summary: Update a package
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePackageBody"
+      responses:
+        "200":
+          description: Package updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+    delete:
+      operationId: deletePackage
+      tags: [packages]
+      summary: Delete a package
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /resellers:
+    get:
+      operationId: listResellers
+      tags: [resellers]
+      summary: List all resellers
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of resellers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResellerWithStats"
+    post:
+      operationId: createReseller
+      tags: [resellers]
+      summary: Create a new reseller
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResellerBody"
+      responses:
+        "201":
+          description: Reseller created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /resellers/{id}:
+    put:
+      operationId: updateReseller
+      tags: [resellers]
+      summary: Update a reseller
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResellerBody"
+      responses:
+        "200":
+          description: Reseller updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteReseller
+      tags: [resellers]
+      summary: Delete a reseller
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /resellers/{id}/toggle:
+    post:
+      operationId: toggleReseller
+      tags: [resellers]
+      summary: Toggle reseller active state
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reseller toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +538,382 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required: [token, user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, reseller, client]
+        service:
+          type: string
+          enum: [plex, jellyfin, emby]
+          nullable: true
+        serverId:
+          type: integer
+          nullable: true
+        packageId:
+          type: integer
+          nullable: true
+        active:
+          type: boolean
+        expiresAt:
+          type: string
+          nullable: true
+        resellerId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, name, email, role, active, createdAt]
+
+    CreateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, reseller, client]
+        service:
+          type: string
+          enum: [plex, jellyfin, emby]
+        serverId:
+          type: integer
+        packageId:
+          type: integer
+        expiresAt:
+          type: string
+        resellerId:
+          type: integer
+      required: [name, email, password, role]
+
+    UpdateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, reseller, client]
+        service:
+          type: string
+          enum: [plex, jellyfin, emby]
+        serverId:
+          type: integer
+        packageId:
+          type: integer
+        active:
+          type: boolean
+        expiresAt:
+          type: string
+        resellerId:
+          type: integer
+
+    ResellerWithStats:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+        clientCount:
+          type: integer
+      required: [id, name, email, active, createdAt, clientCount]
+
+    CreateResellerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required: [name, email, password]
+
+    UpdateResellerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        active:
+          type: boolean
+
+    Server:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+        type:
+          type: string
+          enum: [plex, jellyfin, emby]
+        apiKey:
+          type: string
+        active:
+          type: boolean
+        userCount:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, name, url, type, apiKey, active, userCount, createdAt]
+
+    CreateServerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        type:
+          type: string
+          enum: [plex, jellyfin, emby]
+        apiKey:
+          type: string
+        active:
+          type: boolean
+      required: [name, url, type, apiKey]
+
+    UpdateServerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        type:
+          type: string
+          enum: [plex, jellyfin, emby]
+        apiKey:
+          type: string
+        active:
+          type: boolean
+
+    ServerTestResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        serverName:
+          type: string
+          nullable: true
+        version:
+          type: string
+          nullable: true
+        responseMs:
+          type: integer
+          nullable: true
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              status:
+                type: string
+                enum: [ok, fail, skip]
+              detail:
+                type: string
+                nullable: true
+            required: [name, status]
+        error:
+          type: string
+          nullable: true
+      required: [success, checks]
+
+    Package:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        durationDays:
+          type: integer
+        services:
+          type: array
+          items:
+            type: string
+            enum: [plex, jellyfin, emby]
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        userCount:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, name, price, durationDays, services, active, userCount, createdAt]
+
+    CreatePackageBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        durationDays:
+          type: integer
+        services:
+          type: array
+          items:
+            type: string
+            enum: [plex, jellyfin, emby]
+        description:
+          type: string
+        active:
+          type: boolean
+      required: [name, price, durationDays, services]
+
+    UpdatePackageBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        durationDays:
+          type: integer
+        services:
+          type: array
+          items:
+            type: string
+            enum: [plex, jellyfin, emby]
+        description:
+          type: string
+        active:
+          type: boolean
+
+    DashboardStats:
+      type: object
+      properties:
+        totalClients:
+          type: integer
+        totalResellers:
+          type: integer
+        totalServers:
+          type: integer
+        activeServers:
+          type: integer
+        totalPackages:
+          type: integer
+        activeDemos:
+          type: integer
+        clientsByService:
+          type: object
+          properties:
+            plex:
+              type: integer
+            jellyfin:
+              type: integer
+            emby:
+              type: integer
+          required: [plex, jellyfin, emby]
+        recentUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+      required: [totalClients, totalResellers, totalServers, activeServers, totalPackages, activeDemos, clientsByService, recentUsers]
+
+    StreamingSessions:
+      type: object
+      properties:
+        plex:
+          type: integer
+        jellyfin:
+          type: integer
+        emby:
+          type: integer
+        plexSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/StreamingSession"
+        jellyfinSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/StreamingSession"
+        embySessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/StreamingSession"
+      required: [plex, jellyfin, emby, plexSessions, jellyfinSessions, embySessions]
+
+    StreamingSession:
+      type: object
+      properties:
+        user:
+          type: string
+        title:
+          type: string
+        progress:
+          type: number
+        quality:
+          type: string
+      required: [user, title, progress, quality]
