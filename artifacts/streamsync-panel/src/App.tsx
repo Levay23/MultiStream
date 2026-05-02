@@ -12,7 +12,13 @@ import Servers from "@/pages/Servers";
 import Packages from "@/pages/Packages";
 import Resellers from "@/pages/Resellers";
 import ServicePage from "@/pages/ServicePage";
+import { setBaseUrl } from "@workspace/api-client-react";
+import "@/lib/firebase";
 import { useEffect } from "react";
+
+if (import.meta.env.VITE_API_URL) {
+  setBaseUrl(import.meta.env.VITE_API_URL);
+}
 
 function handleUnauthorized(error: unknown) {
   if (error instanceof ApiError && error.status === 401) {

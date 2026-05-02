@@ -47,3 +47,10 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Firebase & Functions
+.firebase/
+functions/
+scratch/
+.firebaserc
+firebase.json

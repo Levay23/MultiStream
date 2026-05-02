@@ -15,11 +15,16 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
+import { onRequest } from "firebase-functions/v2/https";
 
-  logger.info({ port }, "Server listening");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, (err) => {
+    if (err) {
+      logger.error({ err }, "Error listening on port");
+      process.exit(1);
+    }
+    logger.info({ port }, "Server listening");
+  });
+}
+
+export const api = onRequest({ region: "us-central1", memory: "256MiB" }, app);
