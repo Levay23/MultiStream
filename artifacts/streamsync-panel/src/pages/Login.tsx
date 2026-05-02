@@ -64,7 +64,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { login } = useAuth();
   const loginMutation = useLogin();
-  const [email, setEmail] = useState("admin@streamsync.io");
+  const [email, setEmail] = useState("admin@streamsync.com");
   const [password, setPassword] = useState("admin123");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
@@ -356,7 +356,7 @@ export default function Login() {
           >
             <div className="flex-1 h-px bg-white/5" />
             <p className="text-[11px] text-white/20 whitespace-nowrap">
-              admin@streamsync.io / admin123
+              admin@streamsync.com / admin123
             </p>
             <div className="flex-1 h-px bg-white/5" />
           </motion.div>
