@@ -16,7 +16,7 @@ He preparado todo para que el panel funcione sin que tengas que pagar el Plan Bl
    - **Build Command**: `pnpm install && node ./build.mjs`
    - **Start Command**: `node ./dist/index.mjs`
 5. En la pestaña **Environment**, añade estas variables:
-   - `DATABASE_URL`: (Pega la URL que copiaste de Neon)
+   - `DATABASE_URL`: `postgresql://neondb_owner:npg_ILmb1DnYeO9z@ep-noisy-queen-am39t9ve.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require`
    - `PORT`: `8080`
    - `NODE_ENV`: `production`
 6. Una vez desplegado, copia la URL de Render (ej: `https://panelstream-api.onrender.com`).
