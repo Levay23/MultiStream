@@ -17,12 +17,8 @@ if (Number.isNaN(port) || port <= 0) {
 
 import { onRequest } from "firebase-functions/v2/https";
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, (err) => {
-    if (err) {
-      logger.error({ err }, "Error listening on port");
-      process.exit(1);
-    }
+if (process.env.NODE_ENV !== "production" || process.env.RENDER) {
+  app.listen(port, () => {
     logger.info({ port }, "Server listening");
   });
 }
