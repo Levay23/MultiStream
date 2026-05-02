@@ -10,7 +10,7 @@ He preparado todo para que el panel funcione sin que tengas que pagar el Plan Bl
 ### Paso 2: Backend (Render.com)
 1. Ve a [Render.com](https://render.com/) y crea una cuenta gratis.
 2. Haz clic en **New +** > **Web Service**.
-3. Conecta tu repositorio de GitHub (o sube la carpeta `artifacts/api-server`).
+3. Conecta tu repositorio de GitHub: **Levay23/MultiStream**.
 4. Configura el servicio así:
    - **Runtime**: `Node`
    - **Build Command**: `pnpm install && node ./build.mjs`
